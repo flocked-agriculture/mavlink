@@ -2535,7 +2535,7 @@
         <param index="4" label="Dispersion Type" enum="MAV_DISPERSION_TYPE">The type of dispersion this device supports. This indicates units as outlined in enum</param>
         <param index="5" label="Dispersion Frame" enum="MAV_DISPERSION_FRAME">The reference frame for the provided target values that allows use of relative or absolute corrections.</param>
         <param index="6" label="Target Dispersion Rate">Target dispersion rate for the system. Units are determined based on the MAV_DISPERSION_TYPE. (liters/min or kg/min)</param>
-        <param index="7" label="Target Droplet Size Um">Target droplet size for spray nozzles if dispersion type indicates atomizer spray. Invalid:NaN, <=0. Droplet diameter in micrometers.</param>
+        <param index="7" label="Target Droplet Size Um">Target droplet size for spray nozzles if dispersion type indicates atomizer spray. Invalid:NaN, 0, or negative. Droplet diameter in micrometers.</param>
       </entry>
       <entry value="30012" name="MAV_CMD_SET_DISPERSION_LOCK" hasLocation="false" isDestination="false">
         <description>Command for locking/unlocking the device. The lock is intended to serve as an emergency off by preventing the device from responding to MAV_CMD_SET_DISPERSION_DEVICE_RATE messages. When locked, the device should stop dispersing.</description>
@@ -5336,7 +5336,7 @@
       <entry value="4" name="DISPERSION_DEVICE_STATE_FATAL_ERROR">
         <description>Dispersion device has a fatal error that blocks continued use.</description>
       </entry>
-      <entry value="4" name="DISPERSION_DEVICE_STATE_RESUPPLYING">
+      <entry value="5" name="DISPERSION_DEVICE_STATE_RESUPPLYING">
         <description>Dispersion device is being supplied for next mission.</description>
       </entry>
     </enum>
@@ -7824,6 +7824,36 @@
       <field type="int32_t" name="y">Y coordinate of center point.  Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.</field>
       <field type="float" name="z" units="m">Altitude of center point. Coordinate system depends on frame field.</field>
     </message>
+    <message id="361" name="DISPERSION_DEVICE_INFORMATION">
+      <description>Information about a dispersion device. This message should be requested by a source such as the ground control station using MAV_CMD_REQUEST_MESSAGE. The min/max limits are driven by the underlying hardware. Software defined limits will be a subset of the limits specified here.</description>
+      <field type="uint64_t" name="timestamp_us" units="us">Unix time stamp in microseconds</field>
+      <field type="uint8_t" name="subcomponent_id">Subcomponent id (ie nozzle) this message is associated with, 0 represents the entire device. Send information multiple times for multiple subcomponents.</field>
+      <field type="uint8_t" name="subcomponent_count" invalid="UINT8_MAX">Number of controllable subcomponents this dispersion device has. (ie variable nozzle bodies or boom segment control). 0 or 1 indicates the subcomponent and device are the same.</field>
+      <field type="uint16_t" name="cap_flags" enum="DISPERSION_DEVICE_CAP_FLAGS" display="bitmask">Bitmap of dispersion device or subcomponent capability flags.</field>
+      <field type="uint16_t" name="custom_cap_flags" display="bitmask">Bitmap for use for dispersion-specific capability flags.</field>
+      <field type="char[64]" name="workspace_ftp_url">File transfer protocol (FTP) url-like string pointing to the workspace directory for device. You can find the param file, logging files, and prescription files located here. </field>
+      <field type="float" name="dispersion_rate_min" invalid="NaN">Minimum dispersion rate this device can support. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters/min or kg/min)</field>
+      <field type="float" name="dispersion_rate_max" invalid="NaN">Maximum dispersion rate this device can support. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters/min or kg/min)</field>
+      <field type="uint32_t" name="pressure_min" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, minimum pressure the hardware supports independent of nozzle configuration</field>
+      <field type="uint32_t" name="pressure_max" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, maximum pressure the hardware supports independent of nozzle configuration</field>
+      <field type="float" name="capacity_max" invalid="NaN">Maximum fill capacity of this device in Liters for sprayers and Kg for spreaders. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters or kg)</field>
+      <field type="uint16_t" name="droplet_diameter_max" invalid="0">Maximum supported droplet diameter if system supports variable droplet size nozzles</field>
+      <field type="uint16_t" name="droplet_diameter_min" invalid="0">Minimum supported droplet diameter if system supports variable droplet size nozzles</field>
+    </message>
+    <message id="362" name="DISPERSION_DEVICE_STATUS">
+      <description>Message reporting the status of a dispersion device. This message should be published at a low regular rate (e.g. 5 Hz) but also during key events such as a mavlink command, flag change, or rapid pressure change.</description>
+      <field type="uint64_t" name="timestamp_us" units="us">Unix time stamp in microseconds.</field>
+      <field type="uint8_t" name="subcomponent_id">Subcomponent id (ie nozzle) this message is associated with, 0 represents the entire device. Send status multiple times for multiple subcomponents.</field>
+      <field type="uint8_t" name="dispersion_type" enum="MAV_DISPERSION_TYPE">Dispersion type. Defines units for device capacity and dispersion rate.</field>
+      <field type="uint8_t" name="state" enum="DISPERSION_DEVICE_STATE">Code representing current device state.</field>
+      <field type="uint8_t" name="error_code" enum="DISPERSION_DEVICE_ERRORS">An error code indicating what specific fatal error has occurred to halt the device from functioning.</field>
+      <field type="uint16_t" name="warning_flags" enum="DISPERSION_DEVICE_WARNINGS" display="bitmask">Warning flags (0 for no warning).</field>
+      <field type="uint8_t" name="custom_codes">Leave some flexibility for device manufacturers to pass more information through. This gives up to 255 codes to represent internal system state.</field>
+      <field type="float" name="fill_level" invalid="NaN">Current device tank fill level. This field should be ignored if the device capability flags indicate fill level measurement is not supported. Units are determined based on the MAV_DISPERSION_TYPE. (liters or kg)</field>
+      <field type="float" name="dispersion_rate" invalid="NaN">Current dispersion rate of the device. Negative during refill. Units are determined based on the MAV_DISPERSION_TYPE. (liters/min or kg/min)</field>
+      <field type="uint32_t" name="pressure" units="Pa" invalid="UINT32_MAX">Current pressure of the dispersion system if dispersion type indicates it is a sprayer.</field>
+      <field type="uint16_t" name="droplet_diameter" invalid="0">Current droplet size if dispersion_type is MAV_DISPERSION_TYPE_SPRAY_VARIABLE_SIZE.</field>
+    </message>
     <message id="370" name="SMART_BATTERY_INFO">
       <deprecated since="2024-02" replaced_by="BATTERY_INFO">The BATTERY_INFO message is better aligned with UAVCAN messages, and in any case is useful even if a battery is not "smart".</deprecated>
       <description>Smart Battery information (static/infrequent update). Use for updates from: smart battery to flight stack, flight stack to GCS. Use BATTERY_STATUS for the frequent battery updates.</description>
@@ -7845,36 +7875,6 @@
       <field type="uint32_t" name="discharge_maximum_current" units="mA" invalid="0">Maximum pack discharge current. 0: field not provided.</field>
       <field type="uint32_t" name="discharge_maximum_burst_current" units="mA" invalid="0">Maximum pack discharge burst current. 0: field not provided.</field>
       <field type="char[11]" name="manufacture_date" invalid="[0]">Manufacture date (DD/MM/YYYY) in ASCII characters, 0 terminated. All 0: field not provided.</field>
-    </message>
-    <message id="360" name="DISPERSION_DEVICE_INFORMATION">
-        <description>Information about a dispersion device. This message should be requested by a source such as the ground control station using MAV_CMD_REQUEST_MESSAGE. The min/max limits are driven by the underlying hardware. Software defined limits will be a subset of the limits specified here.</description>
-        <field type="uint64_t" name="timestamp_us" units="us">Unix time stamp in microseconds</field>
-        <field type="uint8_t" name="subcomponent_id">Subcomponent id (ie nozzle) this message is associated with, 0 represents the entire device. Send information multiple times for multiple subcomponents.</field>
-        <field type="uint8_t" name="subcomponent_count" invalid="UINT8_MAX">Number of controllable subcomponents this dispersion device has. (ie variable nozzle bodies or boom segment control). 0 or 1 indicates the subcomponent and device are the same.</field>
-        <field type="uint16_t" name="cap_flags" enum="DISPERSION_DEVICE_CAP_FLAGS" display="bitmask">Bitmap of dispersion device or subcomponent capability flags.</field>
-        <field type="uint16_t" name="custom_cap_flags" display="bitmask">Bitmap for use for dispersion-specific capability flags.</field>
-        <field type="char[64]" name="workspace_ftp_url">File transfer protocol (FTP) url-like string pointing to the workspace directory for device. You can find the param file, logging files, and prescription files located here. </field>
-        <field type="float" name="dispersion_rate_min" invalid="NaN">Minimum dispersion rate this device can support. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters/min or kg/min)</field>
-        <field type="float" name="dispersion_rate_max" invalid="NaN">Maximum dispersion rate this device can support. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters/min or kg/min)</field>
-        <field type="uint32_t" name="pressure_min" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, minimum pressure the hardware supports independent of nozzle configuration</field>
-        <field type="uint32_t" name="pressure_max" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, maximum pressure the hardware supports independent of nozzle configuration</field>
-        <field type="float" name="capacity_max" invalid="NaN">Maximum fill capacity of this device in Liters for sprayers and Kg for spreaders. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters or kg)</field>
-        <field type="uint16_t" name="droplet_diameter_max" invalid="0">Maximum supported droplet diameter if system supports variable droplet size nozzles</field>
-        <field type="uint16_t" name="droplet_diameter_min" invalid="0">Minimum supported droplet diameter if system supports variable droplet size nozzles</field>
-    </message>
-    <message id="361" name="DISPERSION_DEVICE_STATUS">
-      <description>Message reporting the status of a dispersion device. This message should be published at a low regular rate (e.g. 5 Hz) but also during key events such as a mavlink command, flag change, or rapid pressure change.</description>
-      <field type="uint64_t" name="timestamp_us" units="us">Unix time stamp in microseconds.</field>
-      <field type="uint8_t" name="subcomponent_id">Subcomponent id (ie nozzle) this message is associated with, 0 represents the entire device. Send status multiple times for multiple subcomponents.</field>
-      <field type="uint8_t" name="dispersion_type" enum="MAV_DISPERSION_TYPE">Dispersion type. Defines units for device capacity and dispersion rate.</field>
-      <field type="uint8_t" name="state" enum="DISPERSION_DEVICE_STATE">Code representing current device state.</field>
-      <field type="uint8_t" name="error_code" enum="DISPERSION_DEVICE_ERRORS">An error code indicating what specific fatal error has occurred to halt the device from functioning.</field>
-      <field type="uint16_t" name="warning_flags" enum="DISPERSION_DEVICE_WARNINGS" display="bitmask">Warning flags (0 for no warning).</field>
-      <field type="uint8_t" name="custom_codes">Leave some flexibility for device manufacturers to pass more information through. This gives up to 255 codes to represent internal system state.</field>
-      <field type="float" name="fill_level" invalid="NaN">Current device tank fill level. This field should be ignored if the device capability flags indicate fill level measurement is not supported. Units are determined based on the MAV_DISPERSION_TYPE. (liters or kg)</field>
-      <field type="float" name="dispersion_rate" invalid="NaN">Current dispersion rate of the device. Negative during refill. Units are determined based on the MAV_DISPERSION_TYPE. (liters/min or kg/min)</field>
-      <field type="uint32_t" name="pressure" units="Pa" invalid="UINT32_MAX">Current pressure of the dispersion system if dispersion type indicates it is a sprayer.</field>
-      <field type="uint16_t" name="droplet_diameter" invalid="0">Current droplet size if dispersion_type is MAV_DISPERSION_TYPE_SPRAY_VARIABLE_SIZE.</field>
     </message>
     <message id="371" name="FUEL_STATUS">
       <description>Fuel status.
