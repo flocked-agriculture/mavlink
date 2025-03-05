@@ -206,6 +206,9 @@
       <entry value="44" name="MAV_TYPE_ILLUMINATOR">
         <description>Illuminator. An illuminator is a light source that is used for lighting up dark areas external to the sytstem: e.g. a torch or searchlight (as opposed to a light source for illuminating the system itself, e.g. an indicator light).</description>
       </entry>
+      <entry value="45" name="MAV_TYPE_DISPERSION">
+        <description>A device that can disperse a payload. e.g. a liquid sprayer or granular spreader</description>
+      </entry>
     </enum>
     <enum name="MAV_MODE_FLAG" bitmask="true">
       <description>These flags encode the MAV mode.</description>
@@ -543,6 +546,12 @@
       </entry>
       <entry value="105" name="MAV_COMP_ID_CAMERA6">
         <description>Camera #6.</description>
+      </entry>
+      <entry value="110" name="MAV_COMP_ID_DISPERSION">
+        <description>Dispersion device #1</description>
+      </entry>
+      <entry value="111" name="MAV_COMP_ID_DISPERSION2">
+        <description>Dispersion device #2</description>
       </entry>
       <entry value="140" name="MAV_COMP_ID_SERVO1">
         <description>Servo #1.</description>
