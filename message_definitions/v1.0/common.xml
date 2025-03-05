@@ -7856,8 +7856,8 @@
         <field type="uint32_t" name="pressure_min" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, minimum pressure the hardware supports independent of nozzle configuration</field>
         <field type="uint32_t" name="pressure_max" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, maximum pressure the hardware supports independent of nozzle configuration</field>
         <field type="float" name="capacity_max" invalid="NaN">Maximum fill capacity of this device in Liters for sprayers and Kg for spreaders. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters or kg)</field>
-        <field type="uint16_t" name="droplet_diameter_max" units="um" invalid="0">Maximum supported droplet diameter if system supports variable droplet size nozzles</field>
-        <field type="uint16_t" name="droplet_diameter_min" units="um" invalid="0">Minimum supported droplet diameter if system supports variable droplet size nozzles</field>
+        <field type="uint16_t" name="droplet_diameter_max" invalid="0">Maximum supported droplet diameter if system supports variable droplet size nozzles</field>
+        <field type="uint16_t" name="droplet_diameter_min" invalid="0">Minimum supported droplet diameter if system supports variable droplet size nozzles</field>
     </message>
     <message id="361" name="DISPERSION_DEVICE_STATUS">
       <description>Message reporting the status of a dispersion device. This message should be published at a low regular rate (e.g. 5 Hz) but also during key events such as a mavlink command, flag change, or rapid pressure change.</description>
@@ -7871,7 +7871,7 @@
       <field type="float" name="fill_level" invalid="NaN">Current device tank fill level. This field should be ignored if the device capability flags indicate fill level measurement is not supported. Units are determined based on the MAV_DISPERSION_TYPE. (liters or kg)</field>
       <field type="float" name="dispersion_rate" invalid="NaN">Current dispersion rate of the device. Negative during refill. Units are determined based on the MAV_DISPERSION_TYPE. (liters/min or kg/min)</field>
       <field type="uint32_t" name="pressure" units="Pa" invalid="UINT32_MAX">Current pressure of the dispersion system if dispersion type indicates it is a sprayer.</field>
-      <field type="uint16_t" name="droplet_diameter" units="um" invalid="0">Current droplet size if dispersion_type is MAV_DISPERSION_TYPE_SPRAY_VARIABLE_SIZE.</field>
+      <field type="uint16_t" name="droplet_diameter" invalid="0">Current droplet size if dispersion_type is MAV_DISPERSION_TYPE_SPRAY_VARIABLE_SIZE.</field>
     </message>
     <message id="371" name="FUEL_STATUS">
       <description>Fuel status.
