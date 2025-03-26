@@ -240,7 +240,7 @@
       - "OFFSET": Deprecated synonym for "BODY" (origin travels with the vehicle). Not to be used for new frames.
 
       Some deprecated frames do not follow these conventions (e.g. MAV_FRAME_BODY_NED and MAV_FRAME_BODY_OFFSET_NED).
- </description>
+      </description>
       <entry value="0" name="MAV_FRAME_GLOBAL">
         <description>Global (WGS84) coordinate frame + altitude relative to mean sea level (MSL).</description>
       </entry>
@@ -1559,7 +1559,7 @@
 
 	      When sent as a command it triggers a landing using a mission landing pattern.
 	      The location parameters are not used in this case, and should be set to 0.
-	</description>
+	      </description>
         <param index="1">Empty</param>
         <param index="2">Empty</param>
         <param index="3">Empty</param>
@@ -1736,7 +1736,7 @@
           The persistence/lifetime of the setting is undefined.
           Depending on flight stack implementation it may persist until superseded, or it may revert to a system default at the end of a mission.
           Flight stacks typically reset the setting to system defaults on reboot.
-	</description>
+	      </description>
         <param index="1" label="Enable" minValue="0" maxValue="2" increment="1">enable? (0=disable, 1=enable, 2=disable_floor_only)</param>
         <param index="2" label="Types" enum="FENCE_TYPE">Fence types to enable or disable as a bitmask. A value of 0 indicates that all fences should be enabled or disabled. This parameter is ignored if param 1 has the value 2</param>
         <param index="3">Empty</param>
@@ -1860,17 +1860,17 @@
         <description>
           Set the mission item with sequence number seq as the current item and emit MISSION_CURRENT (whether or not the mission number changed).
           If a mission is currently being executed, the system will continue to this new mission item on the shortest path, skipping any intermediate mission items.
-	  Note that mission jump repeat counters are not reset unless param2 is set (see MAV_CMD_DO_JUMP param2).
+          Note that mission jump repeat counters are not reset unless param2 is set (see MAV_CMD_DO_JUMP param2).
 
-          This command may trigger a mission state-machine change on some systems: for example from MISSION_STATE_NOT_STARTED or MISSION_STATE_PAUSED to MISSION_STATE_ACTIVE.
-          If the system is in mission mode, on those systems this command might therefore start, restart or resume the mission.
-          If the system is not in mission mode this command must not trigger a switch to mission mode.
+                This command may trigger a mission state-machine change on some systems: for example from MISSION_STATE_NOT_STARTED or MISSION_STATE_PAUSED to MISSION_STATE_ACTIVE.
+                If the system is in mission mode, on those systems this command might therefore start, restart or resume the mission.
+                If the system is not in mission mode this command must not trigger a switch to mission mode.
 
-          The mission may be "reset" using param2.
-          Resetting sets jump counters to initial values (to reset counters without changing the current mission item set the param1 to `-1`).
-          Resetting also explicitly changes a mission state of MISSION_STATE_COMPLETE to MISSION_STATE_PAUSED or MISSION_STATE_ACTIVE, potentially allowing it to resume when it is (next) in a mission mode.
+                The mission may be "reset" using param2.
+                Resetting sets jump counters to initial values (to reset counters without changing the current mission item set the param1 to `-1`).
+                Resetting also explicitly changes a mission state of MISSION_STATE_COMPLETE to MISSION_STATE_PAUSED or MISSION_STATE_ACTIVE, potentially allowing it to resume when it is (next) in a mission mode.
 
-	  The command will ACK with MAV_RESULT_FAILED if the sequence number is out of range (including if there is no mission item).
+          The command will ACK with MAV_RESULT_FAILED if the sequence number is out of range (including if there is no mission item).
         </description>
         <param index="1" label="Number" minValue="-1" increment="1">Mission sequence value to set. -1 for the current mission item (use to reset mission without changing current mission item).</param>
         <param index="2" label="Reset Mission" minValue="0" maxValue="1" increment="1">Resets mission. 1: true, 0: false. Resets jump counters to initial values and changes mission state "completed" to be "active" or "paused".</param>
@@ -2026,7 +2026,8 @@
       <entry value="410" name="MAV_CMD_GET_HOME_POSITION" hasLocation="false" isDestination="false">
         <deprecated since="2022-04" replaced_by="MAV_CMD_REQUEST_MESSAGE"/>
         <description>Request the home position from the vehicle.
-	  The vehicle will ACK the command and then emit the HOME_POSITION message.</description>
+          The vehicle will ACK the command and then emit the HOME_POSITION message.
+        </description>
         <param index="1">Reserved</param>
         <param index="2">Reserved</param>
         <param index="3">Reserved</param>
@@ -2369,8 +2370,8 @@
       </entry>
       <entry value="3001" name="MAV_CMD_ARM_AUTHORIZATION_REQUEST" hasLocation="false" isDestination="false">
         <description>Request authorization to arm the vehicle to a external entity, the arm authorizer is responsible to request all data that is needs from the vehicle before authorize or deny the request.
-		If approved the COMMAND_ACK message progress field should be set with period of time that this authorization is valid in seconds.
-		If the authorization is denied COMMAND_ACK.result_param2 should be set with one of the reasons in ARM_AUTH_DENIED_REASON.
+          If approved the COMMAND_ACK message progress field should be set with period of time that this authorization is valid in seconds.
+          If the authorization is denied COMMAND_ACK.result_param2 should be set with one of the reasons in ARM_AUTH_DENIED_REASON.
         </description>
         <param index="1" label="System ID" minValue="0" maxValue="255" increment="1">Vehicle system id, this way ground station can request arm authorization on behalf of any vehicle</param>
       </entry>
@@ -2525,6 +2526,23 @@
         <param index="5">Reserved</param>
         <param index="6">Reserved</param>
         <param index="7">Reserved</param>
+      </entry>
+      <entry value="30011" name="MAV_CMD_DO_SET_DISPERSION_TARGETS" hasLocation="false" isDestination="false">
+        <description>Command to provide real time adjustment to dispersion device output for a given dispersion profile configured using MAV_CMD_CONFIG_DISPERSION_DEVICE_PARAMS.</description>
+        <param index="1" label="Timestamp Us" units="us">The unix timestamp for message creation in microseconds</param>
+        <param index="2" label="Device ID" enum="MAV_COMPONENT">Component ID of dispersion device to address, 0 for all dispersion device components. Send command multiple times for more than one device (but not all devices).</param>
+        <param index="3" label="Subcomponent ID">Subcomponent id (ie nozzle) to address, 0 for device. 1 or greater for a subcomponent. Send command multiple times for multiple subcomponents.</param>
+        <param index="4" label="Dispersion Type" enum="MAV_DISPERSION_TYPE">The type of dispersion this device supports. This indicates units as outlined in enum</param>
+        <param index="5" label="Dispersion Frame" enum="MAV_DISPERSION_FRAME">The reference frame for the provided target values that allows use of relative or absolute corrections.</param>
+        <param index="6" label="Target Dispersion Rate">Target dispersion rate for the system. Units are determined based on the MAV_DISPERSION_TYPE. (liters/min or kg/min)</param>
+        <param index="7" label="Target Droplet Size Um">Target droplet size for spray nozzles if dispersion type indicates atomizer spray. Invalid:NaN, 0, or negative. Droplet diameter in micrometers.</param>
+      </entry>
+      <entry value="30012" name="MAV_CMD_SET_DISPERSION_LOCK" hasLocation="false" isDestination="false">
+        <description>Command for locking/unlocking the device. The lock is intended to serve as an emergency off by preventing the device from responding to MAV_CMD_SET_DISPERSION_DEVICE_RATE messages. When locked, the device should stop dispersing.</description>
+        <param index="1" label="Timestamp Us" units="us">The unix timestamp for message creation in microseconds</param>
+        <param index="2" label="Device ID" enum="MAV_COMPONENT">Component ID of dispersion device to address, 0 for all dispersion device components. Send command multiple times for more than one device (but not all devices).</param>
+        <param index="3" label="Subcomponent ID">Subcomponent id (ie nozzle) to address, 0 for all subcomponents. Send command multiple times for multiple subcomponents.</param>
+        <param index="4" label="Lock">Stop dispersion and prevent the dispersion device from responding to input for live dispersion rate changes until unlocked. 1 to lock. 0 or any other value to unlock.</param>
       </entry>
       <!-- from ardupilotmega.xml (hence ID is in that range) -->
       <entry value="42006" name="MAV_CMD_FIXED_MAG_CAL_YAW">
@@ -5144,9 +5162,7 @@
       </entry>
     </enum>
     <enum name="SAFETY_SWITCH_STATE">
-      <description>
-	Possible safety switch states.
-      </description>
+      <description>Possible safety switch states.</description>
       <entry value="0" name="SAFETY_SWITCH_STATE_SAFE">
         <description>Safety switch is engaged and vehicle should be safe to approach.</description>
       </entry>
@@ -5283,6 +5299,123 @@
       <description>Flags used in HIL_ACTUATOR_CONTROLS message.</description>
       <entry value="1" name="HIL_ACTUATOR_CONTROLS_FLAGS_LOCKSTEP">
         <description>Simulation is using lockstep</description>
+      </entry>
+    </enum>
+    <enum name="DISPERSION_DEVICE_CAP_FLAGS" bitmask="true">
+      <description>Dispersion device capability flags (bitmap).</description>
+      <entry value="1" name="DISPERSION_DEVICE_CAP_FLAGS_SPRAYER">
+        <description>Device supports dispersing liquid payloads.</description>
+      </entry>
+      <entry value="2" name="DISPERSION_DEVICE_CAP_FLAGS_SPREADER">
+        <description>Device supports dispersing granular payloads.</description>
+      </entry>
+      <entry value="4" name="DISPERSION_DEVICE_CAP_FLAGS_VARIABLE_DROP_SIZE">
+        <description>Device supports control of droplet size at individual nozzles.</description>
+      </entry>
+      <entry value="8" name="DISPERSION_DEVICE_CAP_FLAGS_DYNAMIC_SPEED_CORRECTIONS">
+        <description>Device supports varying dispersion rate with speed changes up to provided limits.</description>
+      </entry>
+      <entry value="16" name="DISPERSION_DEVICE_CAP_FILL_LEVEL_MEASURE">
+        <description>Device supports measuring its own fill level.</description>
+      </entry>
+    </enum>
+    <enum name="DISPERSION_DEVICE_STATE">
+      <description>Dispersion device states as unique identified codes.</description>
+      <entry value="0" name="DISPERSION_DEVICE_STATE_UNKNOWN">
+        <description>Device state is unknown.</description>
+      </entry>
+      <entry value="1" name="DISPERSION_DEVICE_STATE_READY">
+        <description>Dispersion device is ready for control inputs to deliver payload.</description>
+      </entry>
+      <entry value="2" name="DISPERSION_DEVICE_STATE_ACTIVE">
+        <description>Dispersion device is delivering payload.</description>
+      </entry>
+      <entry value="3" name="DISPERSION_DEVICE_STATE_LOCKED">
+        <description>Dispersion device is locked and wont respond to control inputs.</description>
+      </entry>
+      <entry value="4" name="DISPERSION_DEVICE_STATE_FATAL_ERROR">
+        <description>Dispersion device has a fatal error that blocks continued use.</description>
+      </entry>
+      <entry value="5" name="DISPERSION_DEVICE_STATE_RESUPPLYING">
+        <description>Dispersion device is being supplied for next mission.</description>
+      </entry>
+    </enum>
+    <enum name="DISPERSION_DEVICE_ERRORS">
+      <description>Dispersion device error codes. An non zero value indicates the device has a fatal error and has turned off.</description>
+      <entry value="0" name="DISPERSION_DEVICE_ERRORS_NO_ERRORS">
+        <description>Device has no errors.</description>
+      </entry>
+      <entry value="1" name="DISPERSION_DEVICE_ERRORS_UNKNOWN">
+        <description>Device has had an unknown error.</description>
+      </entry>
+      <entry value="2" name="DISPERSION_DEVICE_ERRORS_CLOGGED">
+        <description>Device is clogged.</description>
+      </entry>
+      <entry value="3" name="DISPERSION_DEVICE_ERRORS_MOTOR_FAILURE">
+        <description>Device dispersion motor or pump has failed.</description>
+      </entry>
+      <entry value="4" name="DISPERSION_DEVICE_ERRORS_IMPROPER_CONFIGURATION">
+        <description>Device configuration is not compatible with device limits.</description>
+      </entry>
+      <entry value="5" name="DISPERSION_DEVICE_ERRORS_OVERSPEED">
+        <description>System is moving faster than the device can deliver.</description>
+      </entry>
+      <entry value="6" name="DISPERSION_DEVICE_ERRORS_UNDERSPEED">
+        <description>System is moving slower than the device can support.</description>
+      </entry>
+      <entry value="7" name="DISPERSION_DEVICE_ERRORS_LEAK">
+        <description>Device is not maintaining pressure as expected.</description>
+      </entry>
+      <entry value="8" name="DISPERSION_DEVICE_ERRORS_UNEXPECTED_VEHICLE_BEHAVIOR">
+        <description>Device detected an unexpected event like a crash.</description>
+      </entry>
+      <entry value="9" name="DISPERSION_DEVICE_ERRORS_FILL_EMPTY">
+        <description>Device ran out of its payload.</description>
+      </entry>
+    </enum>
+    <enum name="DISPERSION_DEVICE_WARNINGS" bitmask="true">
+      <description>Dispersion device warning flags. Any warning flag indicates an issue that does not block operation of the device.</description>
+      <entry value="1" name="DISPERSION_DEVICE_WARNINGS_UNKNOWN">
+        <description>Device has had an unknown warning</description>
+      </entry>
+      <entry value="2" name="DISPERSION_DEVICE_WARNINGS_LOG_FULL">
+        <description>Device log file has reached its memory limit and is overwritting the oldest files.</description>
+      </entry>
+      <entry value="4" name="DISPERSION_DEVICE_WARNINGS_CLAMPED_DROPLET_SIZE">
+        <description>An unsupported droplet size was requested and it was clamped to allowed limits.</description>
+      </entry>
+      <entry value="8" name="DISPERSION_DEVICE_WARNINGS_UNEXPECTED_FILL_LEVEL_MEASUREMENT">
+        <description>Dispersion device was filled to an unexpected level which might impact dispersion.</description>
+      </entry>
+      <entry value="16" name="DISPERSION_DEVICE_WARNINGS_FILL_LEVEL_MEASURE_BROKEN">
+        <description>There is an issue with the fill level measuring system.</description>
+      </entry>
+    </enum>
+    <enum name="MAV_DISPERSION_TYPE">
+      <description>The dispersion type a device is setup for. Dispersion types specify the units for capacity and dispersion rate.</description>
+      <entry value="0" name="MAV_DISPERSION_TYPE_UNKNOWN">
+        <description>Not specified</description>
+      </entry>
+      <entry value="1" name="MAV_DISPERSION_TYPE_SPRAY_FIXED_SIZE">
+        <description>A generic liquid payload is being dispersed via fixed droplet size nozzles. Units are in Liters for capacity and Liters/min for dispersion rate</description>
+      </entry>
+      <entry value="2" name="MAV_DISPERSION_TYPE_SPRAY_VARIABLE_SIZE">
+        <description>A generic liquid payload is being dispersed via a nozzle that supports variable droplet sizes. Units are in Liters for capacity, Liters/min for dispersion rate, and micrometers for target droplet size.</description>
+      </entry>
+      <entry value="3" name="MAV_DISPERSION_TYPE_SPREAD">
+        <description>A generic solid payload of granules is being dispersed. Units are in Kg for capacity and Kg/min for dispersion rate</description>
+      </entry>
+    </enum>
+    <enum name="MAV_DISPERSION_FRAME">
+      <description>The reference frame for dispersion device command values.</description>
+      <entry value="0" name="MAV_DISPERSION_FRAME_UNKNOWN">
+        <description>Not specified.</description>
+      </entry>
+      <entry value="1" name="MAV_DISPERSION_FRAME_ABSOLUTE">
+        <description>Dispersion control values should be set to the exact values provided in control message.</description>
+      </entry>
+      <entry value="2" name="MAV_DISPERSION_FRAME_OFFSET">
+        <description>Default dispersion control values should be offset by the amount specified in the control message.</description>
       </entry>
     </enum>
   </enums>
@@ -6912,12 +7045,12 @@
     </message>
     <message id="242" name="HOME_POSITION">
       <description>
-	Contains the home position.
-	The home position is the default position that the system will return to and land on.
-	The position must be set automatically by the system during the takeoff, and may also be explicitly set using MAV_CMD_DO_SET_HOME.
-	The global and local positions encode the position in the respective coordinate frames, while the q parameter encodes the orientation of the surface.
-	Under normal conditions it describes the heading and terrain slope, which can be used by the aircraft to adjust the approach.
-	The approach 3D vector describes the point to which the system should fly in normal flight mode and then perform a landing sequence along the vector.
+        Contains the home position.
+        The home position is the default position that the system will return to and land on.
+        The position must be set automatically by the system during the takeoff, and may also be explicitly set using MAV_CMD_DO_SET_HOME.
+        The global and local positions encode the position in the respective coordinate frames, while the q parameter encodes the orientation of the surface.
+        Under normal conditions it describes the heading and terrain slope, which can be used by the aircraft to adjust the approach.
+        The approach 3D vector describes the point to which the system should fly in normal flight mode and then perform a landing sequence along the vector.
         Note: this message can be requested by sending the MAV_CMD_REQUEST_MESSAGE with param1=242 (or the deprecated MAV_CMD_GET_HOME_POSITION command).
       </description>
       <field type="int32_t" name="latitude" units="degE7">Latitude (WGS84)</field>
@@ -6941,7 +7074,7 @@
       <deprecated since="2022-02" replaced_by="MAV_CMD_DO_SET_HOME">The command protocol version (MAV_CMD_DO_SET_HOME) allows a GCS to detect when setting the home position has failed.</deprecated>
       <description>
         Sets the home position.
-	The home position is the default position that the system will return to and land on.
+	      The home position is the default position that the system will return to and land on.
         The position is set automatically by the system during the takeoff (and may also be set using this message).
         The global and local positions encode the position in the respective coordinate frames, while the q parameter encodes the orientation of the surface.
         Under normal conditions it describes the heading and terrain slope, which can be used by the aircraft to adjust the approach.
@@ -6966,8 +7099,9 @@
       <description>
         The interval between messages for a particular MAVLink message ID.
         This message is sent in response to the MAV_CMD_REQUEST_MESSAGE command with param1=244 (this message) and param2=message_id (the id of the message for which the interval is required).
-	It may also be sent in response to MAV_CMD_GET_MESSAGE_INTERVAL.
-	This interface replaces DATA_STREAM.</description>
+	      It may also be sent in response to MAV_CMD_GET_MESSAGE_INTERVAL.
+	      This interface replaces DATA_STREAM.
+      </description>
       <field type="uint16_t" name="message_id">The ID of the requested MAVLink message. v1.0 is limited to 254 messages.</field>
       <field type="int32_t" name="interval_us" units="us">The interval between two messages. A value of -1 indicates this stream is disabled, 0 indicates it is not available, &gt; 0 indicates the interval at which it is sent.</field>
     </message>
@@ -7347,17 +7481,18 @@
     </message>
     <message id="284" name="GIMBAL_DEVICE_SET_ATTITUDE">
       <description>Low level message to control a gimbal device's attitude.
-	  This message is to be sent from the gimbal manager to the gimbal device component.
-	  The quaternion and angular velocities can be set to NaN according to use case.
-	  For the angles encoded in the quaternion and the angular velocities holds:
-	  If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME is set, then they are relative to the vehicle heading (vehicle frame).
-	  If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME is set, then they are relative to absolute North (earth frame).
-	  If neither of these flags are set, then (for backwards compatibility) it holds:
-	  If the flag GIMBAL_DEVICE_FLAGS_YAW_LOCK is set, then they are relative to absolute North (earth frame),
-	  else they are relative to the vehicle heading (vehicle frame).
-	  Setting both GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME and GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME is not allowed.
-	  These rules are to ensure backwards compatibility.
-	  New implementations should always set either GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME or GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME.</description>
+        This message is to be sent from the gimbal manager to the gimbal device component.
+        The quaternion and angular velocities can be set to NaN according to use case.
+        For the angles encoded in the quaternion and the angular velocities holds:
+        If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME is set, then they are relative to the vehicle heading (vehicle frame).
+        If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME is set, then they are relative to absolute North (earth frame).
+        If neither of these flags are set, then (for backwards compatibility) it holds:
+        If the flag GIMBAL_DEVICE_FLAGS_YAW_LOCK is set, then they are relative to absolute North (earth frame),
+        else they are relative to the vehicle heading (vehicle frame).
+        Setting both GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME and GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME is not allowed.
+        These rules are to ensure backwards compatibility.
+        New implementations should always set either GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME or GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME.
+      </description>
       <field type="uint8_t" name="target_system">System ID</field>
       <field type="uint8_t" name="target_component">Component ID</field>
       <field type="uint16_t" name="flags" enum="GIMBAL_DEVICE_FLAGS">Low level gimbal flags.</field>
@@ -7367,21 +7502,23 @@
       <field type="float" name="angular_velocity_z" units="rad/s" invalid="NaN">Z component of angular velocity (positive: yawing to the right). The frame is described in the message description. NaN to be ignored.</field>
     </message>
     <message id="285" name="GIMBAL_DEVICE_ATTITUDE_STATUS">
-      <description>Message reporting the status of a gimbal device.
-	  This message should be broadcast by a gimbal device component at a low regular rate (e.g. 5 Hz).
-	  For the angles encoded in the quaternion and the angular velocities holds:
-	  If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME is set, then they are relative to the vehicle heading (vehicle frame).
-	  If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME is set, then they are relative to absolute North (earth frame).
-	  If neither of these flags are set, then (for backwards compatibility) it holds:
-	  If the flag GIMBAL_DEVICE_FLAGS_YAW_LOCK is set, then they are relative to absolute North (earth frame),
-	  else they are relative to the vehicle heading (vehicle frame).
-	  Other conditions of the flags are not allowed.
-	  The quaternion and angular velocities in the other frame can be calculated from delta_yaw and delta_yaw_velocity as
-	  q_earth = q_delta_yaw * q_vehicle and w_earth = w_delta_yaw_velocity + w_vehicle (if not NaN).
-	  If neither the GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME nor the GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME flag is set,
-	  then (for backwards compatibility) the data in the delta_yaw and delta_yaw_velocity fields are to be ignored.
-	  New implementations should always set either GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME or GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME,
-	  and always should set delta_yaw and delta_yaw_velocity either to the proper value or NaN.</description>
+      <description>
+        Message reporting the status of a gimbal device.
+        This message should be broadcast by a gimbal device component at a low regular rate (e.g. 5 Hz).
+        For the angles encoded in the quaternion and the angular velocities holds:
+        If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME is set, then they are relative to the vehicle heading (vehicle frame).
+        If the flag GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME is set, then they are relative to absolute North (earth frame).
+        If neither of these flags are set, then (for backwards compatibility) it holds:
+        If the flag GIMBAL_DEVICE_FLAGS_YAW_LOCK is set, then they are relative to absolute North (earth frame),
+        else they are relative to the vehicle heading (vehicle frame).
+        Other conditions of the flags are not allowed.
+        The quaternion and angular velocities in the other frame can be calculated from delta_yaw and delta_yaw_velocity as
+        q_earth = q_delta_yaw * q_vehicle and w_earth = w_delta_yaw_velocity + w_vehicle (if not NaN).
+        If neither the GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME nor the GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME flag is set,
+        then (for backwards compatibility) the data in the delta_yaw and delta_yaw_velocity fields are to be ignored.
+        New implementations should always set either GIMBAL_DEVICE_FLAGS_YAW_IN_VEHICLE_FRAME or GIMBAL_DEVICE_FLAGS_YAW_IN_EARTH_FRAME,
+        and always should set delta_yaw and delta_yaw_velocity either to the proper value or NaN.
+      </description>
       <field type="uint8_t" name="target_system">System ID</field>
       <field type="uint8_t" name="target_component">Component ID</field>
       <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot).</field>
@@ -7686,6 +7823,36 @@
       <field type="int32_t" name="x">X coordinate of center point. Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.</field>
       <field type="int32_t" name="y">Y coordinate of center point.  Coordinate system depends on frame field: local = x position in meters * 1e4, global = latitude in degrees * 1e7.</field>
       <field type="float" name="z" units="m">Altitude of center point. Coordinate system depends on frame field.</field>
+    </message>
+    <message id="361" name="DISPERSION_DEVICE_INFORMATION">
+      <description>Information about a dispersion device. This message should be requested by a source such as the ground control station using MAV_CMD_REQUEST_MESSAGE. The min/max limits are driven by the underlying hardware. Software defined limits will be a subset of the limits specified here.</description>
+      <field type="uint64_t" name="timestamp_us" units="us">Unix time stamp in microseconds</field>
+      <field type="uint8_t" name="subcomponent_id">Subcomponent id (ie nozzle) this message is associated with, 0 represents the entire device. Send information multiple times for multiple subcomponents.</field>
+      <field type="uint8_t" name="subcomponent_count" invalid="UINT8_MAX">Number of controllable subcomponents this dispersion device has. (ie variable nozzle bodies or boom segment control). 0 or 1 indicates the subcomponent and device are the same.</field>
+      <field type="uint16_t" name="cap_flags" enum="DISPERSION_DEVICE_CAP_FLAGS" display="bitmask">Bitmap of dispersion device or subcomponent capability flags.</field>
+      <field type="uint16_t" name="custom_cap_flags" display="bitmask">Bitmap for use for dispersion-specific capability flags.</field>
+      <field type="char[64]" name="workspace_ftp_url">File transfer protocol (FTP) url-like string pointing to the workspace directory for device. You can find the param file, logging files, and prescription files located here. </field>
+      <field type="float" name="dispersion_rate_min" invalid="NaN">Minimum dispersion rate this device can support. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters/min or kg/min)</field>
+      <field type="float" name="dispersion_rate_max" invalid="NaN">Maximum dispersion rate this device can support. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters/min or kg/min)</field>
+      <field type="uint32_t" name="pressure_min" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, minimum pressure the hardware supports independent of nozzle configuration</field>
+      <field type="uint32_t" name="pressure_max" units="Pa" invalid="UINT32_MAX">If this is a spray dispersion system, maximum pressure the hardware supports independent of nozzle configuration</field>
+      <field type="float" name="capacity_max" invalid="NaN">Maximum fill capacity of this device in Liters for sprayers and Kg for spreaders. Units are determined based on the DISPERSION_DEVICE_CAP_FLAGS. (liters or kg)</field>
+      <field type="uint16_t" name="droplet_diameter_max" invalid="0">Maximum supported droplet diameter if system supports variable droplet size nozzles</field>
+      <field type="uint16_t" name="droplet_diameter_min" invalid="0">Minimum supported droplet diameter if system supports variable droplet size nozzles</field>
+    </message>
+    <message id="362" name="DISPERSION_DEVICE_STATUS">
+      <description>Message reporting the status of a dispersion device. This message should be published at a low regular rate (e.g. 5 Hz) but also during key events such as a mavlink command, flag change, or rapid pressure change.</description>
+      <field type="uint64_t" name="timestamp_us" units="us">Unix time stamp in microseconds.</field>
+      <field type="uint8_t" name="subcomponent_id">Subcomponent id (ie nozzle) this message is associated with, 0 represents the entire device. Send status multiple times for multiple subcomponents.</field>
+      <field type="uint8_t" name="dispersion_type" enum="MAV_DISPERSION_TYPE">Dispersion type. Defines units for device capacity and dispersion rate.</field>
+      <field type="uint8_t" name="state" enum="DISPERSION_DEVICE_STATE">Code representing current device state.</field>
+      <field type="uint8_t" name="error_code" enum="DISPERSION_DEVICE_ERRORS">An error code indicating what specific fatal error has occurred to halt the device from functioning.</field>
+      <field type="uint16_t" name="warning_flags" enum="DISPERSION_DEVICE_WARNINGS" display="bitmask">Warning flags (0 for no warning).</field>
+      <field type="uint8_t" name="custom_codes">Leave some flexibility for device manufacturers to pass more information through. This gives up to 255 codes to represent internal system state.</field>
+      <field type="float" name="fill_level" invalid="NaN">Current device tank fill level. This field should be ignored if the device capability flags indicate fill level measurement is not supported. Units are determined based on the MAV_DISPERSION_TYPE. (liters or kg)</field>
+      <field type="float" name="dispersion_rate" invalid="NaN">Current dispersion rate of the device. Negative during refill. Units are determined based on the MAV_DISPERSION_TYPE. (liters/min or kg/min)</field>
+      <field type="uint32_t" name="pressure" units="Pa" invalid="UINT32_MAX">Current pressure of the dispersion system if dispersion type indicates it is a sprayer.</field>
+      <field type="uint16_t" name="droplet_diameter" invalid="0">Current droplet size if dispersion_type is MAV_DISPERSION_TYPE_SPRAY_VARIABLE_SIZE.</field>
     </message>
     <message id="370" name="SMART_BATTERY_INFO">
       <deprecated since="2024-02" replaced_by="BATTERY_INFO">The BATTERY_INFO message is better aligned with UAVCAN messages, and in any case is useful even if a battery is not "smart".</deprecated>
